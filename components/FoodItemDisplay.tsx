@@ -79,7 +79,9 @@ const FoodItemDisplay: React.FC<FoodItemDisplayProps> = ({ item, daysLeft, onRem
           )}
         </p>
         <div className="flex items-center flex-wrap gap-2 mt-1">
-            {!showConsumeButton && <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block ${expiryBadgeBgClass} ${daysTextColorClass}`}>{daysText}</span>}
+            {/* Always show daysText badge */}
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block ${expiryBadgeBgClass} ${daysTextColorClass}`}>{daysText}</span>
+            
             {showConsumeButton && item.count && item.count > 0 && (
                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block bg-blue-100 text-blue-700`}>
                     Count: {item.count}

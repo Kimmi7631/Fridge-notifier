@@ -26,18 +26,6 @@ const App: React.FC = () => {
           <FoodForm onAddFood={addFoodItem} />
         </section>
 
-        <section aria-labelledby="countable-items-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
-          <h2 id="countable-items-heading" className="text-xl sm:text-2xl font-semibold mb-4 text-green-700">
-            Trackable Items by Count
-          </h2>
-          <CountableItemsList
-            foodItems={foodItems}
-            onConsumeItem={consumeFoodItem}
-            onRemoveFood={removeFoodItem}
-            calculateDaysLeft={calculateDaysLeft}
-          />
-        </section>
-
         <section aria-labelledby="expiring-soon-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
           <div className="flex justify-between items-center mb-4">
             <h2 id="expiring-soon-heading" className="text-xl sm:text-2xl font-semibold text-orange-700">
@@ -47,6 +35,18 @@ const App: React.FC = () => {
           </div>
           <ExpiringSoonList
             foodItems={foodItems}
+            onRemoveFood={removeFoodItem}
+            calculateDaysLeft={calculateDaysLeft}
+          />
+        </section>
+
+        <section aria-labelledby="countable-items-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
+          <h2 id="countable-items-heading" className="text-xl sm:text-2xl font-semibold mb-4 text-green-700">
+            Trackable Items by Count
+          </h2>
+          <CountableItemsList
+            foodItems={foodItems}
+            onConsumeItem={consumeFoodItem}
             onRemoveFood={removeFoodItem}
             calculateDaysLeft={calculateDaysLeft}
           />
