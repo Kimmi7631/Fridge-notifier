@@ -1,15 +1,10 @@
 
 import React, { useState } from 'react';
-import { StorageType, FoodCategory, foodCategories, foodCategoryDisplayMap } from '../types';
+import { StorageType, FoodCategory, foodCategories, foodCategoryDisplayMap, storageTypeDisplayMap } from '../types';
 
 interface FoodFormProps {
   onAddFood: (name: string, expirationDate: string, storageType: StorageType, category: FoodCategory) => boolean;
 }
-
-const storageTypeDisplayMap: Record<StorageType, string> = {
-  Refrigerated: '냉장',
-  Frozen: '냉동',
-};
 
 export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
   const [name, setName] = useState('');
@@ -62,9 +57,9 @@ export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
 
     const added = onAddFood(name.trim(), fullExpirationDateString, storageType, category);
     if (added) {
-      const displayStorageType = storageTypeDisplayMap[storageType];
+      const displayStorage = storageTypeDisplayMap[storageType];
       const displayCategory = foodCategoryDisplayMap[category];
-      setSuccessMessage(`"${name.trim()}" (${displayStorageType}, ${displayCategory}) added successfully for ${fullExpirationDateString}!`);
+      setSuccessMessage(`"${name.trim()}" (${displayStorage}, ${displayCategory}) added successfully for ${fullExpirationDateString}!`);
       setName('');
       setMonthDay('');
       setStorageType('Refrigerated');
@@ -121,8 +116,9 @@ export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
             className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
             aria-required="true"
           >
-            <option value="Refrigerated">{storageTypeDisplayMap.Refrigerated}</option>
-            <option value="Frozen">{storageTypeDisplayMap.Frozen}</option>
+            {(Object.keys(storageTypeDisplayMap) as StorageType[]).map(st => (
+              <option key={st} value={st}>{storageTypeDisplayMap[st]}</option>
+            ))}
           </select>
         </div>
         <div className="md:col-span-1">

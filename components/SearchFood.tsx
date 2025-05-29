@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { FoodItem } from '../types';
+import { FoodItem, storageTypeDisplayMap } from '../types';
 import FoodItemDisplay from './FoodItemDisplay';
 
 interface SearchFoodProps {
@@ -36,9 +36,9 @@ const ListSection: React.FC<{
 export const SearchFood: React.FC<SearchFoodProps> = ({ foodItems, calculateDaysLeft, onRemoveFood }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { refrigeratedResults, frozenResults, totalResults } = useMemo(() => {
+  const { refrigeratedResults, frozenResults, otherResults, totalResults } = useMemo(() => {
     if (!searchTerm.trim()) {
-      return { refrigeratedResults: [], frozenResults: [], totalResults: 0 };
+      return { refrigeratedResults: [], frozenResults: [], otherResults: [], totalResults: 0 };
     }
     const results = foodItems
       .filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -52,6 +52,7 @@ export const SearchFood: React.FC<SearchFoodProps> = ({ foodItems, calculateDays
     return {
       refrigeratedResults: results.filter(item => item.storageType === 'Refrigerated'),
       frozenResults: results.filter(item => item.storageType === 'Frozen'),
+      otherResults: results.filter(item => item.storageType === 'Others'),
       totalResults: results.length,
     };
   }, [searchTerm, foodItems, calculateDaysLeft]);
@@ -77,8 +78,9 @@ export const SearchFood: React.FC<SearchFoodProps> = ({ foodItems, calculateDays
       )}
       {totalResults > 0 && (
         <div className="space-y-3 max-h-60 overflow-y-auto pr-1" role="list" aria-live="polite">
-          <ListSection title="냉장 검색 결과" items={refrigeratedResults} onRemoveFood={onRemoveFood} />
-          <ListSection title="냉동 검색 결과" items={frozenResults} onRemoveFood={onRemoveFood} />
+          <ListSection title={`${storageTypeDisplayMap.Refrigerated} 검색 결과`} items={refrigeratedResults} onRemoveFood={onRemoveFood} />
+          <ListSection title={`${storageTypeDisplayMap.Frozen} 검색 결과`} items={frozenResults} onRemoveFood={onRemoveFood} />
+          <ListSection title={`${storageTypeDisplayMap.Others} 검색 결과`} items={otherResults} onRemoveFood={onRemoveFood} />
         </div>
       )}
     </div>

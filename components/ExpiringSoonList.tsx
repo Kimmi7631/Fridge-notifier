@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FoodItem } from '../types';
+import { FoodItem, storageTypeDisplayMap } from '../types';
 import FoodItemDisplay from './FoodItemDisplay';
 
 interface ExpiringSoonListProps {
@@ -43,6 +43,7 @@ export const ExpiringSoonList: React.FC<ExpiringSoonListProps> = ({ foodItems, o
 
   const refrigeratedItems = processedItems.filter(item => item.storageType === 'Refrigerated');
   const frozenItems = processedItems.filter(item => item.storageType === 'Frozen');
+  const otherItems = processedItems.filter(item => item.storageType === 'Others');
 
   if (processedItems.length === 0) {
     return <p className="text-slate-500 text-center py-4">No items expiring in the next 3 days. Great job!</p>;
@@ -50,8 +51,9 @@ export const ExpiringSoonList: React.FC<ExpiringSoonListProps> = ({ foodItems, o
 
   return (
     <div className="space-y-3">
-      <ListSection title="냉장" items={refrigeratedItems} onRemoveFood={onRemoveFood} />
-      <ListSection title="냉동" items={frozenItems} onRemoveFood={onRemoveFood} />
+      <ListSection title={storageTypeDisplayMap.Refrigerated} items={refrigeratedItems} onRemoveFood={onRemoveFood} />
+      <ListSection title={storageTypeDisplayMap.Frozen} items={frozenItems} onRemoveFood={onRemoveFood} />
+      <ListSection title={storageTypeDisplayMap.Others} items={otherItems} onRemoveFood={onRemoveFood} />
     </div>
   );
 };

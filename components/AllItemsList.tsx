@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { FoodItem, FoodCategory, foodCategories, foodCategoryDisplayMap } from '../types';
+import { FoodItem, FoodCategory, foodCategories, foodCategoryDisplayMap, storageTypeDisplayMap } from '../types';
 import FoodItemDisplay from './FoodItemDisplay';
 
 interface AllItemsListProps {
@@ -49,6 +49,8 @@ export const AllItemsList: React.FC<AllItemsListProps> = ({ foodItems, onRemoveF
 
   const refrigeratedItems = filteredAndProcessedItems.filter(item => item.storageType === 'Refrigerated');
   const frozenItems = filteredAndProcessedItems.filter(item => item.storageType === 'Frozen');
+  const otherItems = filteredAndProcessedItems.filter(item => item.storageType === 'Others');
+
 
   if (foodItems.length === 0) {
     return <p className="text-slate-500 text-center py-4">No items are currently stored. Add some!</p>;
@@ -99,16 +101,22 @@ export const AllItemsList: React.FC<AllItemsListProps> = ({ foodItems, onRemoveF
 
       <div className="max-h-96 overflow-y-auto pr-1">
         <ListSection 
-            title="냉장" 
+            title={storageTypeDisplayMap.Refrigerated}
             items={refrigeratedItems} 
             onRemoveFood={onRemoveFood} 
             ariaLabelledBy="refrigerated-heading-all"
         />
         <ListSection 
-            title="냉동" 
+            title={storageTypeDisplayMap.Frozen}
             items={frozenItems} 
             onRemoveFood={onRemoveFood}
             ariaLabelledBy="frozen-heading-all"
+        />
+        <ListSection 
+            title={storageTypeDisplayMap.Others}
+            items={otherItems} 
+            onRemoveFood={onRemoveFood}
+            ariaLabelledBy="others-heading-all"
         />
       </div>
     </div>

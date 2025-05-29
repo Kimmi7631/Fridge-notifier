@@ -1,17 +1,12 @@
 
 import React from 'react';
-import { FoodItem, StorageType, FoodCategory, foodCategoryDisplayMap } from '../types';
+import { FoodItem, StorageType, FoodCategory, foodCategoryDisplayMap, storageTypeDisplayMap } from '../types';
 
 interface FoodItemDisplayProps {
   item: FoodItem;
   daysLeft: number;
   onRemove?: (id: number) => void;
 }
-
-const storageTypeDisplayMap: Record<StorageType, string> = {
-  Refrigerated: '냉장',
-  Frozen: '냉동',
-};
 
 const categoryColorMap: Record<FoodCategory, string> = {
   Fruits: 'bg-pink-100 text-pink-700',
@@ -21,6 +16,12 @@ const categoryColorMap: Record<FoodCategory, string> = {
   Dairy: 'bg-yellow-100 text-yellow-700',
   Prepared: 'bg-purple-100 text-purple-700',
   Others: 'bg-gray-100 text-gray-700',
+};
+
+const storageTypeColorMap: Record<StorageType, string> = {
+  Refrigerated: 'bg-slate-200 text-slate-700',
+  Frozen: 'bg-sky-100 text-sky-700',
+  Others: 'bg-amber-100 text-amber-700',
 };
 
 const FoodItemDisplay: React.FC<FoodItemDisplayProps> = ({ item, daysLeft, onRemove }) => {
@@ -46,8 +47,8 @@ const FoodItemDisplay: React.FC<FoodItemDisplayProps> = ({ item, daysLeft, onRem
     daysTextColorClass = 'text-red-600';
     expiryBadgeBgClass = 'bg-red-100';
   } else if (daysLeft === 0) { // Expires Today
-    daysTextColorClass = 'text-red-700'; // Bolder/darker red for emphasis
-    expiryBadgeBgClass = 'bg-red-200'; // More prominent background
+    daysTextColorClass = 'text-red-700'; 
+    expiryBadgeBgClass = 'bg-red-200'; 
   } else if (daysLeft === 1) { // Expires in 1 Day
     daysTextColorClass = 'text-red-600';
     expiryBadgeBgClass = 'bg-red-100';
@@ -59,7 +60,7 @@ const FoodItemDisplay: React.FC<FoodItemDisplayProps> = ({ item, daysLeft, onRem
     expiryBadgeBgClass = 'bg-green-100';
   }
   
-  const storageTypeColor = item.storageType === 'Frozen' ? 'bg-sky-100 text-sky-700' : 'bg-slate-200 text-slate-700';
+  const storageTypeColor = storageTypeColorMap[item.storageType] || storageTypeColorMap.Others;
   const displayStorageType = storageTypeDisplayMap[item.storageType] || item.storageType;
   const categoryBadgeColor = categoryColorMap[item.category] || categoryColorMap.Others;
   const displayCategoryName = foodCategoryDisplayMap[item.category] || item.category;

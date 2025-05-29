@@ -1,5 +1,11 @@
 
-export type StorageType = 'Refrigerated' | 'Frozen';
+export type StorageType = 'Refrigerated' | 'Frozen' | 'Others';
+
+export const storageTypeDisplayMap: Record<StorageType, string> = {
+  Refrigerated: '냉장',
+  Frozen: '냉동',
+  Others: '기타',
+};
 
 export type FoodCategory = 'Fruits' | 'Vegetables' | 'Meat' | 'Seafood' | 'Dairy' | 'Prepared' | 'Others';
 
