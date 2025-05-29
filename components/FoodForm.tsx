@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { StorageType, FoodCategory, foodCategories, foodCategoryDisplayMap, storageTypeDisplayMap } from '../types';
 
 interface FoodFormProps {
-  onAddFood: (name: string, expirationDate: string, storageType: StorageType, category: FoodCategory) => boolean;
+  onAddFood: (name: string, expirationDate: string, storageType: StorageType, category: FoodCategory, count?: number) => boolean;
 }
 
 export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
@@ -11,6 +11,7 @@ export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
   const [monthDay, setMonthDay] = useState('');
   const [storageType, setStorageType] = useState<StorageType>('Refrigerated');
   const [category, setCategory] = useState<FoodCategory>('Others');
+  const [count, setCount] = useState<string>('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -33,6 +34,17 @@ export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
       setError('Invalid date format. Please use MM-DD (e.g., 07-28).');
       return;
     }
+    
+    let itemCount: number | undefined = undefined;
+    if (count.trim() !== '') {
+        const parsedCount = parseInt(count.trim(), 10);
+        if (isNaN(parsedCount) || parsedCount <= 0) {
+            setError('Count must be a positive number.');
+            return;
+        }
+        itemCount = parsedCount;
+    }
+
 
     const parts = monthDay.trim().split('-');
     const month = parseInt(parts[0], 10);
@@ -55,15 +67,21 @@ export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
     
     const fullExpirationDateString = `${yearToUse}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
 
-    const added = onAddFood(name.trim(), fullExpirationDateString, storageType, category);
+    const added = onAddFood(name.trim(), fullExpirationDateString, storageType, category, itemCount);
     if (added) {
       const displayStorage = storageTypeDisplayMap[storageType];
       const displayCategory = foodCategoryDisplayMap[category];
-      setSuccessMessage(`"${name.trim()}" (${displayStorage}, ${displayCategory}) added successfully for ${fullExpirationDateString}!`);
+      let successMsg = `"${name.trim()}" (${displayStorage}, ${displayCategory}) added successfully for ${fullExpirationDateString}`;
+      if (itemCount) {
+        successMsg += ` with a count of ${itemCount}`;
+      }
+      successMsg += `!`;
+      setSuccessMessage(successMsg);
       setName('');
       setMonthDay('');
       setStorageType('Refrigerated');
-      setCategory('Others'); // Reset category to default
+      setCategory('Others'); 
+      setCount('');
       setTimeout(() => setSuccessMessage(''), 3000); 
     } else {
       setError(`Failed to add "${name.trim()}".`);
@@ -86,26 +104,42 @@ export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
           aria-required="true"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-1">
-          <label htmlFor="expirationDate" className="block text-sm font-medium text-slate-700 mb-1">
-            Expiration (MM-DD)
-          </label>
-          <input
-            type="text"
-            id="expirationDate"
-            value={monthDay}
-            onChange={(e) => setMonthDay(e.target.value)}
-            placeholder="MM-DD"
-            maxLength={5}
-            pattern="(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])"
-            className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-            aria-required="true"
-            aria-describedby="date-format-hint"
-          />
-          <p id="date-format-hint" className="text-xs text-slate-500 mt-1">e.g., 07-28.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label htmlFor="expirationDate" className="block text-sm font-medium text-slate-700 mb-1">
+                Expiration (MM-DD)
+            </label>
+            <input
+                type="text"
+                id="expirationDate"
+                value={monthDay}
+                onChange={(e) => setMonthDay(e.target.value)}
+                placeholder="MM-DD"
+                maxLength={5}
+                pattern="(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                aria-required="true"
+                aria-describedby="date-format-hint"
+            />
+            <p id="date-format-hint" className="text-xs text-slate-500 mt-1">e.g., 07-28.</p>
         </div>
-        <div className="md:col-span-1">
+        <div>
+            <label htmlFor="itemCount" className="block text-sm font-medium text-slate-700 mb-1">
+                Count (Optional)
+            </label>
+            <input
+                type="number"
+                id="itemCount"
+                value={count}
+                onChange={(e) => setCount(e.target.value)}
+                placeholder="e.g., 3"
+                min="1"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+            />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
           <label htmlFor="storageType" className="block text-sm font-medium text-slate-700 mb-1">
             Storage Type
           </label>
@@ -121,7 +155,7 @@ export const FoodForm: React.FC<FoodFormProps> = ({ onAddFood }) => {
             ))}
           </select>
         </div>
-        <div className="md:col-span-1">
+        <div>
           <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-1">
             Category
           </label>

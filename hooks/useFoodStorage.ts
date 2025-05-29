@@ -24,11 +24,12 @@ export const useFoodStorage = () => {
       const storedItemsJson = localStorage.getItem(STORAGE_KEY);
       if (storedItemsJson) {
         const parsedItems: FoodItem[] = JSON.parse(storedItemsJson);
-        // Ensure all items have a storageType and category, defaulting if necessary
+        // Ensure all items have defaults and handle optional count
         const itemsWithDefaults = parsedItems.map(item => ({
           ...item,
           storageType: item.storageType || 'Refrigerated',
-          category: item.category || 'Others' 
+          category: item.category || 'Others',
+          count: item.count // Will be undefined if not present, which is fine
         }));
         itemsWithDefaults.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
         setFoodItems(itemsWithDefaults);
@@ -48,13 +49,14 @@ export const useFoodStorage = () => {
     }
   }, [foodItems]);
 
-  const addFoodItem = useCallback((name: string, expirationDate: string, storageType: StorageType, category: FoodCategory) => {
+  const addFoodItem = useCallback((name: string, expirationDate: string, storageType: StorageType, category: FoodCategory, count?: number) => {
     const newItem: FoodItem = {
       id: Date.now(),
       name,
       expirationDate,
       storageType,
       category,
+      count: count && !isNaN(count) && count > 0 ? count : undefined,
     };
     setFoodItems(prevItems => {
       const updatedItems = [...prevItems, newItem];
@@ -68,5 +70,16 @@ export const useFoodStorage = () => {
     setFoodItems(prevItems => prevItems.filter(item => item.id !== id));
   }, []);
 
-  return { foodItems, addFoodItem, removeFoodItem, calculateDaysLeft };
+  const consumeFoodItem = useCallback((id: number) => {
+    setFoodItems(prevItems =>
+      prevItems.map(item => {
+        if (item.id === id && item.count && item.count > 0) {
+          return { ...item, count: item.count - 1 };
+        }
+        return item;
+      })
+    );
+  }, []);
+
+  return { foodItems, addFoodItem, removeFoodItem, consumeFoodItem, calculateDaysLeft };
 };

@@ -27,4 +27,5 @@ export interface FoodItem {
   expirationDate: string; // YYYY-MM-DD format
   storageType: StorageType;
   category: FoodCategory;
+  count?: number; // Optional count for the item
 }

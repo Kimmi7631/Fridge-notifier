@@ -1,12 +1,14 @@
+
 import React, { useState } from 'react';
 import { FoodForm } from './components/FoodForm';
 import { ExpiringSoonList } from './components/ExpiringSoonList';
 import { SearchFood } from './components/SearchFood';
 import { AllItemsList } from './components/AllItemsList';
+import { CountableItemsList } from './components/CountableItemsList'; // Import new component
 import { useFoodStorage } from './hooks/useFoodStorage';
 
 const App: React.FC = () => {
-  const { foodItems, addFoodItem, removeFoodItem, calculateDaysLeft } = useFoodStorage();
+  const { foodItems, addFoodItem, removeFoodItem, consumeFoodItem, calculateDaysLeft } = useFoodStorage();
   const [showAllItems, setShowAllItems] = useState(false);
 
   return (
@@ -22,6 +24,18 @@ const App: React.FC = () => {
             Add New Food Item
           </h2>
           <FoodForm onAddFood={addFoodItem} />
+        </section>
+
+        <section aria-labelledby="countable-items-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
+          <h2 id="countable-items-heading" className="text-xl sm:text-2xl font-semibold mb-4 text-green-700">
+            Trackable Items by Count
+          </h2>
+          <CountableItemsList
+            foodItems={foodItems}
+            onConsumeItem={consumeFoodItem}
+            onRemoveFood={removeFoodItem}
+            calculateDaysLeft={calculateDaysLeft}
+          />
         </section>
 
         <section aria-labelledby="expiring-soon-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">

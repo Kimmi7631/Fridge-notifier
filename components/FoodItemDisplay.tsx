@@ -6,6 +6,8 @@ interface FoodItemDisplayProps {
   item: FoodItem;
   daysLeft: number;
   onRemove?: (id: number) => void;
+  onConsume?: (id: number) => void; // For CountableItemsList
+  showConsumeButton?: boolean; // To conditionally show consume button
 }
 
 const categoryColorMap: Record<FoodCategory, string> = {
@@ -24,7 +26,7 @@ const storageTypeColorMap: Record<StorageType, string> = {
   Others: 'bg-amber-100 text-amber-700',
 };
 
-const FoodItemDisplay: React.FC<FoodItemDisplayProps> = ({ item, daysLeft, onRemove }) => {
+const FoodItemDisplay: React.FC<FoodItemDisplayProps> = ({ item, daysLeft, onRemove, onConsume, showConsumeButton }) => {
   let daysText: string;
   let daysTextColorClass: string;
   let expiryBadgeBgClass: string;
@@ -68,24 +70,47 @@ const FoodItemDisplay: React.FC<FoodItemDisplayProps> = ({ item, daysLeft, onRem
   return (
     <div className="flex justify-between items-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-150 ease-in-out mb-2">
       <div className="flex-grow">
-        <p className={itemNameClass}>{item.name}</p>
+        <p className={itemNameClass}>
+          {item.name}
+          {item.count && item.count > 0 && !showConsumeButton && (
+            <span className="ml-2 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
+              x{item.count}
+            </span>
+          )}
+        </p>
         <div className="flex items-center flex-wrap gap-2 mt-1">
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block ${expiryBadgeBgClass} ${daysTextColorClass}`}>{daysText}</span>
+            {!showConsumeButton && <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block ${expiryBadgeBgClass} ${daysTextColorClass}`}>{daysText}</span>}
+            {showConsumeButton && item.count && item.count > 0 && (
+                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block bg-blue-100 text-blue-700`}>
+                    Count: {item.count}
+                 </span>
+            )}
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block ${storageTypeColor}`}>{displayStorageType}</span>
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block ${categoryBadgeColor}`}>{displayCategoryName}</span>
         </div>
       </div>
-      {onRemove && (
-        <button
-          onClick={() => onRemove(item.id)}
-          className="ml-2 text-slate-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
-          aria-label={`Remove ${item.name}`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-            <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.58.177-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
-          </svg>
-        </button>
-      )}
+      <div className="flex items-center">
+        {showConsumeButton && onConsume && item.count && item.count > 0 && (
+          <button
+            onClick={() => onConsume(item.id)}
+            className="mr-2 text-xs sm:text-sm font-medium px-2.5 py-1 rounded-md bg-green-500 text-white hover:bg-green-600 transition-colors"
+            aria-label={`Consume one ${item.name}`}
+          >
+            먹었다!
+          </button>
+        )}
+        {onRemove && (
+          <button
+            onClick={() => onRemove(item.id)}
+            className="text-slate-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
+            aria-label={`Remove ${item.name}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+              <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.58.177-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
+            </svg>
+          </button>
+        )}
+      </div>
     </div>
   );
 };
