@@ -1,0 +1,6 @@
+{
+  "name": "냉장고알리미",
+  "description": "A simple web app to track food expiration dates using localStorage. Helps users manage their pantry by highlighting items expiring soon and allowing quick search for any item's status.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
