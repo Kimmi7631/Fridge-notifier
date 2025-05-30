@@ -1,105 +1,129 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FoodForm } from './components/FoodForm';
 import { ExpiringSoonList } from './components/ExpiringSoonList';
 import { SearchFood } from './components/SearchFood';
 import { AllItemsList } from './components/AllItemsList';
-import { CountableItemsList } from './components/CountableItemsList'; // Import new component
+import { CountableItemsList } from './components/CountableItemsList';
 import { useFoodStorage } from './hooks/useFoodStorage';
+// import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const App: React.FC = () => {
-  const { foodItems, addFoodItem, removeFoodItem, consumeFoodItem, calculateDaysLeft } = useFoodStorage();
+  const {
+    foodItems,
+    addFoodItem,
+    removeFoodItem,
+    consumeFoodItem,
+    calculateDaysLeft,
+  } = useFoodStorage();
+
   const [showAllItems, setShowAllItems] = useState(false);
 
-  return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col items-center p-4 sm:p-6 lg:p-8 font-sans">
-      <div className="w-full max-w-lg space-y-8">
-        <header className="text-center pt-4">
-          <h1 className="text-3xl sm:text-4xl font-bold text-sky-700">냉장고알리미</h1>
-          <p className="text-slate-600 mt-1 text-sm sm:text-base">Keep your pantry fresh and waste less!</p>
-        </header>
+  const expiringSoonItems = useMemo(
+    () => foodItems.filter(item => calculateDaysLeft(item.expirationDate) <= 3),
+    [foodItems, calculateDaysLeft]
+  );
 
-        <section aria-labelledby="add-item-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
-          <h2 id="add-item-heading" className="text-xl sm:text-2xl font-semibold mb-4 text-sky-800">
-            Add New Food Item
-          </h2>
-          <FoodForm onAddFood={addFoodItem} />
+  const countableItems = useMemo(
+    () => foodItems.filter(item => item.count !== undefined && item.count > 0),
+    [foodItems]
+  );
+
+  // const categoryData = useMemo(() => {
+  //   const categories: { [key: string]: number } = {};
+  //   foodItems.forEach(item => {
+  //     const catName = foodCategoryDisplayMap[item.category] || foodCategoryDisplayMap.Others; // Requires foodCategoryDisplayMap
+  //     categories[catName] = (categories[catName] || 0) + 1;
+  //   });
+  //   return Object.entries(categories).map(([name, value]) => ({ name, value }));
+  // }, [foodItems]);
+
+  // const COLORS = ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA', '#F472B6', '#7DD3FC', '#FDBA74', '#86EFAC'];
+
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-800 px-4 sm:px-6 lg:px-8 py-10 font-sans transition-colors">
+      <div className="max-w-4xl mx-auto space-y-12">
+
+        {/* Hero Section */}
+        <section className="text-center space-y-4">
+          <h1 className="text-5xl font-extrabold text-sky-600 tracking-tight">냉장고알리미 🧊</h1>
+          <p className="text-lg text-slate-500">AI로 식품을 똑똑하게 관리하세요. 유통기한을 놓치지 마세요.</p>
         </section>
 
-        <section aria-labelledby="expiring-soon-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 id="expiring-soon-heading" className="text-xl sm:text-2xl font-semibold text-orange-700">
-              Expiring Soon
-            </h2>
-            <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full font-medium">3 days or less</span>
+        {/* Add Food */}
+        <section className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          <h2 className="text-2xl font-bold text-sky-700">🥬 새로운 식품 추가</h2>
+          <FoodForm onAddFood={addFoodItem} />
+        </section>
+        
+        {/* Visualization Dashboard - Section Removed */}
+
+
+        {/* Expiring Soon */}
+        <section className="bg-white rounded-2xl shadow-xl p-8 space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-red-600">⏰ 유통기한 임박</h2>
+            <span className="text-sm bg-red-100 text-red-600 px-3 py-1 rounded-full font-medium animate-pulse">3일 이내</span>
           </div>
           <ExpiringSoonList
-            foodItems={foodItems}
+            foodItems={expiringSoonItems}
             onRemoveFood={removeFoodItem}
             calculateDaysLeft={calculateDaysLeft}
           />
         </section>
 
-        <section aria-labelledby="countable-items-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
-          <h2 id="countable-items-heading" className="text-xl sm:text-2xl font-semibold mb-4 text-green-700">
-            Trackable Items by Count
-          </h2>
+        {/* Countable Items */}
+        <section className="bg-white rounded-2xl shadow-xl p-8 space-y-4">
+          <h2 className="text-2xl font-bold text-emerald-600">📦 수량 추적 식품</h2>
           <CountableItemsList
-            foodItems={foodItems}
+            foodItems={countableItems}
             onConsumeItem={consumeFoodItem}
             onRemoveFood={removeFoodItem}
             calculateDaysLeft={calculateDaysLeft}
           />
         </section>
 
-        <section aria-labelledby="search-item-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
-          <h2 id="search-item-heading" className="text-xl sm:text-2xl font-semibold mb-4 text-teal-700">
-            Search Active Pantry Items
-          </h2>
-          <SearchFood 
-            foodItems={foodItems} 
+        {/* Search */}
+        <section className="bg-white rounded-2xl shadow-xl p-8 space-y-4">
+          <h2 className="text-2xl font-bold text-indigo-600">🔍 식품 검색</h2>
+          <SearchFood
+            foodItems={foodItems}
             calculateDaysLeft={calculateDaysLeft}
             onRemoveFood={removeFoodItem}
           />
         </section>
 
-        <section aria-labelledby="all-items-heading" className="bg-white p-5 sm:p-6 rounded-xl shadow-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 id="all-items-heading" className="text-xl sm:text-2xl font-semibold text-indigo-700">
-              All Stored Items
-            </h2>
+        {/* All Items */}
+        <section className="bg-white rounded-2xl shadow-xl p-8 space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-800">📋 전체 보관 식품</h2>
             <button
               onClick={() => setShowAllItems(prev => !prev)}
-              className="px-3 py-1.5 border border-indigo-600 text-indigo-600 text-sm font-medium rounded-md hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 transition-colors"
-              aria-expanded={showAllItems}
-              aria-controls="all-items-list-container"
+              className="bg-sky-600 text-white px-4 py-2 text-sm font-semibold rounded-xl shadow hover:bg-sky-700 active:scale-95 transition"
             >
-              {showAllItems ? 'Hide All' : 'Show All'}
+              {showAllItems ? '숨기기' : `모두 보기 (${foodItems.length})`}
             </button>
           </div>
-          {showAllItems && (
-            <div id="all-items-list-container">
-              <AllItemsList
-                foodItems={foodItems}
-                onRemoveFood={removeFoodItem}
-                calculateDaysLeft={calculateDaysLeft}
-              />
-            </div>
-          )}
-          {!showAllItems && foodItems.length > 0 && (
-            <p className="text-slate-500 text-center py-4">
-              Click "Show All" to view all {foodItems.length} stored item(s).
-            </p>
-          )}
-          {!showAllItems && foodItems.length === 0 && (
-            <p className="text-slate-500 text-center py-4">
-              No items stored yet. Add some items to see them here!
-            </p>
+          {showAllItems ? (
+            <AllItemsList
+              foodItems={foodItems}
+              onRemoveFood={removeFoodItem}
+              calculateDaysLeft={calculateDaysLeft}
+            />
+          ) : (
+            <p className="text-center text-slate-500 italic">항목을 보려면 버튼을 눌러주세요.</p>
           )}
         </section>
         
-        <footer className="text-center text-xs sm:text-sm text-slate-500 py-6">
-          <p>&copy; {new Date().getFullYear()} 냉장고알리미. Stay Fresh!</p>
+        {/* Placeholder for Future Features */}
+        <section className="text-center text-slate-400 pt-4 italic text-sm">
+         🚀 곧 제공됩니다: AI 레시피 추천, 스마트 알림, 공유 기능, PWA 지원...
+        </section>
+
+        {/* Footer */}
+        <footer className="text-center text-sm text-slate-400 pt-10">
+          <p>&copy; {new Date().getFullYear()} 냉장고알리미 | Designed with 🍀</p>
         </footer>
       </div>
     </div>

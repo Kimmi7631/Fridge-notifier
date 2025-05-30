@@ -71,14 +71,21 @@ export const useFoodStorage = () => {
   }, []);
 
   const consumeFoodItem = useCallback((id: number) => {
-    setFoodItems(prevItems =>
-      prevItems.map(item => {
-        if (item.id === id && item.count && item.count > 0) {
-          return { ...item, count: item.count - 1 };
+    setFoodItems(prevItems => {
+      const itemToConsume = prevItems.find(item => item.id === id);
+      if (itemToConsume && itemToConsume.count && itemToConsume.count > 0) {
+        const newCount = itemToConsume.count - 1;
+        if (newCount === 0) {
+          // Remove item if count becomes 0
+          return prevItems.filter(item => item.id !== id);
         }
-        return item;
-      })
-    );
+        // Otherwise, update count
+        return prevItems.map(item =>
+          item.id === id ? { ...item, count: newCount } : item
+        );
+      }
+      return prevItems; // Return previous items if item not found or no count
+    });
   }, []);
 
   return { foodItems, addFoodItem, removeFoodItem, consumeFoodItem, calculateDaysLeft };
